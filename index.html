@@ -3,110 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turrell Light Art</title>
-    <style>
-        body { margin: 0; overflow: hidden; }
-    </style>
+    <title>James Turrell Light Art Recreation</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Load libraries -->
+    <div id="canvas-container"></div>
+    
+    <!-- Load Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    
+    <!-- Load dat.GUI instead of lil-gui (more compatible with direct script loading) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"></script>
     
-    <script>
-        // Initialize Three.js
-        const scene = new THREE.Scene();
-        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-        
-        // Create basic configuration
-        const config = {
-            centerColor: '#3060FF',
-            outerColor: '#80E0E0',
-            animationSpeed: 0.001
-        };
-        
-        // Create shader material
-        const vertexShader = `
-            varying vec2 vUv;
-            void main() {
-                vUv = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-        `;
-        
-        const fragmentShader = `
-            precision highp float;
-            varying vec2 vUv;
-            
-            uniform vec3 centerColor;
-            uniform vec3 outerColor;
-            uniform float aspectRatio;
-            uniform float time;
-            
-            void main() {
-                // Center and correct aspect ratio
-                vec2 center = vec2(0.5, 0.5);
-                vec2 adjustedUV = vUv;
-                adjustedUV.x = (vUv.x - 0.5) * aspectRatio + 0.5;
-                
-                // Calculate distance from center
-                float dist = distance(adjustedUV, center) * 2.0;
-                
-                // Create animated color transition
-                float t = 0.5 + 0.5 * sin(time);
-                vec3 color1 = mix(centerColor, outerColor, t);
-                vec3 color2 = mix(outerColor, centerColor, t);
-                
-                // Create gradient
-                vec3 color = mix(color1, color2, smoothstep(0.0, 0.7, dist));
-                
-                gl_FragColor = vec4(color, 1.0);
-            }
-        `;
-        
-        const material = new THREE.ShaderMaterial({
-            vertexShader: vertexShader,
-            fragmentShader: fragmentShader,
-            uniforms: {
-                centerColor: { value: new THREE.Color(config.centerColor) },
-                outerColor: { value: new THREE.Color(config.outerColor) },
-                aspectRatio: { value: window.innerWidth / window.innerHeight },
-                time: { value: 0 }
-            }
-        });
-        
-        // Create mesh
-        const geometry = new THREE.PlaneGeometry(2, 2);
-        const mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
-        
-        // Create dat.GUI controls
-        const gui = new dat.GUI();
-        gui.addColor(config, 'centerColor').onChange(value => {
-            material.uniforms.centerColor.value.set(value);
-        });
-        gui.addColor(config, 'outerColor').onChange(value => {
-            material.uniforms.outerColor.value.set(value);
-        });
-        gui.add(config, 'animationSpeed', 0.0001, 0.005);
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            material.uniforms.aspectRatio.value = window.innerWidth / window.innerHeight;
-        });
-        
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-            material.uniforms.time.value += config.animationSpeed;
-            renderer.render(scene, camera);
-        }
-        
-        animate();
-    </script>
+    <!-- Your application code -->
+    <script src="js/circular-gradient.js"></script>
+    <script src="js/rectangular-gradient.js"></script>
+    <script src="js/aura-effect.js"></script>
+    <script src="js/controls.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
